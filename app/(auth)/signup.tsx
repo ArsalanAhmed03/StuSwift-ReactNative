@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,69 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { FIREBASE_AUTH } from "../../FireBaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { FIRESTORE_DB } from "../../FireBaseConfig";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function Signup() {
+  const [fullname, setfullname] = useState("");
+  const [username, setusername] = useState("");
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+  const [confirmpass, setconfirmpass] = useState("");
+  const [datausernames, setdatausernames] = useState([]);
+  const [dataemails, setdataemails] = useState([]);
+  const auth = FIREBASE_AUTH;
+
+  const SignPress = async () => {
+    if (username == datausernames) {
+      alert("Username must be unique!");
+      return;
+    }
+    if (email == dataemails) {
+      alert("Email Address must be unique");
+      return;
+    }
+    const userinfo = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userinfo.user;
+    await setDoc(doc(FIRESTORE_DB, "Users", user.uid), {
+      fullName: fullname,
+      username: username,
+      email: email,
+      password: password,
+      createdAt: new Date(),
+    });
+
+    router.back();
+  };
+
+  const loginBtnPressed = () => {
+    router.back();
+  };
+
+  function handlesignup() {
+    if (!fullname || !username || !email || !password || !confirmpass) {
+      alert("Fill all the feilds");
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+    if (password != confirmpass) {
+      alert("Fill both Password feilds same");
+      return;
+    }
+    SignPress();
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Join StuSwift Universe!</Text>
@@ -18,39 +79,49 @@ export default function Signup() {
         style={styles.input}
         placeholder="Full Name"
         placeholderTextColor="#ccc"
+        value={fullname}
+        onChangeText={setfullname}
       />
       <TextInput
         style={styles.input}
         placeholder="UserName"
         placeholderTextColor="#ccc"
+        value={username}
+        onChangeText={setusername}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
         placeholderTextColor="#ccc"
         keyboardType="email-address"
+        value={email}
+        onChangeText={setemail}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#ccc"
-        secureTextEntry
+        secureTextEntry={true}
+        value={password}
+        onChangeText={setpassword}
       />
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
         placeholderTextColor="#ccc"
-        secureTextEntry
+        secureTextEntry={true}
+        value={confirmpass}
+        onChangeText={setconfirmpass}
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.button} onPress={handlesignup}>
         <Text style={styles.buttonText}>Confirm Sign Up</Text>
       </TouchableOpacity>
 
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Already have an account?</Text>
         {/* <Link href="/login" asChild> */}
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={loginBtnPressed}>
           <Text style={styles.signupText}> Login</Text>
         </TouchableOpacity>
         {/* </Link> */}

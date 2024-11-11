@@ -1,5 +1,6 @@
 import { Link, router } from "expo-router";
 import React from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,17 +8,47 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../../FireBaseConfig";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function Login() {
-  const handleLogin = () => {
-    const isValid = true;
-
-    if (isValid) {
-      router.replace("/(tabs)");
-    } else {
-      alert("Invalid credentials");
-    }
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+  const auth = FIREBASE_AUTH;
+  const LoginPress = async () => {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
   };
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      alert("Fill all fields");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    LoginPress().then(() => {
+      router.replace("/(tabs)");
+      alert("Welcome " + email);
+    });
+  };
+
+  const signUpPressed = () => {
+    router.push("/(auth)/signup");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Sign In Into Your Account</Text>
@@ -28,12 +59,16 @@ export default function Login() {
         placeholder="Email"
         placeholderTextColor="#ccc"
         keyboardType="email-address"
+        value={email}
+        onChangeText={setemail}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#ccc"
-        secureTextEntry
+        value={password}
+        onChangeText={setpassword}
+        secureTextEntry={true}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -43,7 +78,7 @@ export default function Login() {
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Don’t have an account?</Text>
         {/* <Link href="/signup" asChild> */}
-        <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
+        <TouchableOpacity onPress={signUpPressed}>
           <Text style={styles.signupText}> Sign Up Now</Text>
         </TouchableOpacity>
         {/* </Link> */}

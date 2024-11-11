@@ -1,5 +1,6 @@
 // app/(tabs)/index.tsx
 import { View, Text } from 'react-native';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 const Home = () => (
   <View>

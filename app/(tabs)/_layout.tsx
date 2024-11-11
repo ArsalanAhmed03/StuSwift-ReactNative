@@ -45,14 +45,13 @@ const TabLayout = () => {
             iconName = "musical-notes";
           }
 
-          // If focused, wrap icon with a circular background
           return (
             <View
               style={{
                 backgroundColor: focused ? "white" : "transparent",
                 borderTopLeftRadius: 25,
                 borderTopRightRadius: 25,
-                padding: focused ? 7 : 0, // Add padding for the white background circle
+                padding: focused ? 7 : 0, 
               }}
             >
               <Ionicons name={iconName} color={focused ? "#283593" : color} size={size} />
@@ -65,21 +64,21 @@ const TabLayout = () => {
         name="tasks"
         options={{
           title: "Tasks",
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -93,7 +92,7 @@ const TabLayout = () => {
         name="music"
         options={{
           title: "Music",
-          headerShown: true,
+          headerShown: false,
         }}
       />
     </Tabs>
